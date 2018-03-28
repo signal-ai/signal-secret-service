@@ -12,7 +12,7 @@ The chamber tool is a wrapper that performs this action for multiple secrets for
 $ brew install chamber
 ```
 
-For more specific documentation see the chamber [documentation](https://github.com/segmentio/chamber)
+For more specific documentation for writing secrets/reading specific secrets see the chamber [documentation](https://github.com/segmentio/chamber)
 
 Specific useful command for collecting secrets for multiple services and optionaly overriding one of those secrets from service_2 for a specific entry point:
 
@@ -20,7 +20,7 @@ Specific useful command for collecting secrets for multiple services and optiona
 $ chamber exec service_1 service_2 -- <entrypoint.sh> OVERRIDE_SERVICE_2_SECRET=123456
 ```
 
-# Container Entrypoint Installation
+# Container Entrypoint Configuration
 
 [TO BE UPDATED]
 
