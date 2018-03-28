@@ -1,2 +1,2 @@
 # signal-docker
-Tools to build Signal Docker containers.
+Signal's Secret Service
