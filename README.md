@@ -12,13 +12,21 @@ The chamber tool is a wrapper that performs this action for multiple secrets for
 $ brew install chamber
 ```
 
-For more specific documentation for writing secrets/reading specific secrets see the chamber [documentation](https://github.com/segmentio/chamber)
+An example command to write a secret to ssm for a specific service:
+```
+$ chamber write <service> <key> <value>
+```
 
-Specific useful command for collecting secrets for multiple services and optionaly overriding one of those secrets from service_2 for a specific entry point:
+If `-` is provided as the value argument, the value will be read from standard
+input.
+
+An example useful command for collecting secrets for multiple services and optionaly overriding one of those secrets from service_2 for a specific entry point:
 
 ```
 $ chamber exec service_1 service_2 -- <entrypoint.sh> OVERRIDE_SERVICE_2_SECRET=123456
 ```
+
+For more specific documentation for writing more complex operations see the chamber [documentation](https://github.com/segmentio/chamber)
 
 # Container Entrypoint Configuration
 
