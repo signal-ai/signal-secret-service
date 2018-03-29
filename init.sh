@@ -25,7 +25,7 @@ to_secrets=$(/chamber export $SECRET_SERVICES -f dotenv | sed 's/\(=[[:blank:]]*
 eval_export to_secrets
 
 # Perform overrides
-o_override=$(for k in $keys ; do for v in $original_variables ; do echo $v |grep $k |grep -v SECRET ; done ; done)
+to_override=$(for k in $keys ; do for v in $original_variables ; do echo $v |grep $k |grep -v SECRET ; done ; done)
 if [ ! -z "$to_override" -a "$to_override" != " " ]; then
     echo "Applying ENV overrides..."
     eval_export $to_override
