@@ -24,7 +24,7 @@ if [ $# -eq 0 ]; then
 fi
 
 eval_export() {
-    to_export=$1
+    to_export="$@"
     keys=$(for v in $to_export ; do echo $v | awk -F '=' '{print $1}' ; done)
     echo $keys
     eval export $to_export
@@ -32,7 +32,7 @@ eval_export() {
 
 # Get list of ENV variables injected by Docker
 echo "Getting ENV variables..."
-original_variables=$(export | awk -F ' ' '{print $3}')
+original_variables=$(export | cut -f2 -d ' ')
 
 # Call chamber with services from ENV $SECRET_SERVICES and export decrypted ENV variables
 echo "Fetching ENV secrets with chamber for systems $SECRET_SERVICES..."
@@ -40,7 +40,7 @@ to_secrets=$(/chamber export $SECRET_SERVICES -f dotenv | sed 's/\(=[[:blank:]]*
 eval_export $to_secrets
 
 # Perform overrides
-to_override=$(for k in $keys ; do for v in $original_variables ; do echo $v |grep $k |grep -v SECRET ; done ; done)
+to_override=$(for k in $keys ; do for v in $original_variables ; do echo $v |grep ^$k |grep -v SECRET ; done ; done)
 if [ ! -z "$to_override" -a "$to_override" != " " ]; then
     echo "Applying ENV overrides..."
     eval_export $to_override
