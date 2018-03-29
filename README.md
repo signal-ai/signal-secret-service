@@ -8,7 +8,7 @@ The principle of this tool is to provide a clear route for a developer or and ap
 
 The chamber wrapper is designed for secret provisioning when executing the entrypoint script in conatiners. It is designed to extrapolate and parse secrets into specific strings needed in execution.
 
-# Local Developer Installation
+# Local Use
 
 ```
 $ brew install chamber
