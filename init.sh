@@ -37,7 +37,7 @@ original_variables=$(export | awk -F ' ' '{print $3}')
 # Call chamber with services from ENV $SECRET_SERVICES and export decrypted ENV variables
 echo "Fetching ENV secrets with chamber..."
 to_secrets=$(/chamber export $SECRET_SERVICES -f dotenv | sed 's/\(=[[:blank:]]*\)\(.*\)/\1"\2"/')
-eval_export to_secrets
+eval_export $to_secrets
 
 # Perform overrides
 to_override=$(for k in $keys ; do for v in $original_variables ; do echo $v |grep $k |grep -v SECRET ; done ; done)
