@@ -4,6 +4,20 @@
 # supports ENV overrides and extrapolation.
 # chamber services are exported from ENV $SECRET_SERVICES.
 
+curl=$(which curl)
+chamber_version="2.0.0"
+chamber_url="https://github.com/segmentio/chamber/releases/download/v${chamber_version}/chamber-v${chamber_version}-linux-amd64"
+
+if [ ! -f "/chamber" ]; then
+    echo "Downloading chamber from $chamber_url"
+    $curl -L $chamber_url -o /chamber
+fi
+
+if [ $# -eq 0 ]; then
+    echo "No arguments supplied"
+    exit
+fi
+
 AWS_REGION=${AWS_REGION:=eu-west-1}
 SECRET_SERVICES=${SECRET_SERVICES:=global}
 export AWS_REGION=$AWS_REGION
