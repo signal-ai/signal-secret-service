@@ -19,7 +19,7 @@ An example command to write a secret to ssm for a specific service:
 $ chamber write <service> <key> <value>
 ```
 
-If `-` is provided as the value argument, the value will be read from standard
+If `<->` is provided as the `<value></value>` argument, the value will be read from standard
 input.
 
 An example command for collecting secrets for multiple services and optionaly overriding one of those secrets from service_2 for a specific entry point:
