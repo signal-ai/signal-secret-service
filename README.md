@@ -20,7 +20,7 @@ $ chamber write <service> <key> <value>
 If `-` is provided as the value argument, the value will be read from standard
 input.
 
-An example useful command for collecting secrets for multiple services and optionaly overriding one of those secrets from service_2 for a specific entry point:
+An example command for collecting secrets for multiple services and optionaly overriding one of those secrets from service_2 for a specific entry point:
 
 ```
 $ chamber exec service_1 service_2 -- <entrypoint.sh> OVERRIDE_SERVICE_2_SECRET=123456
