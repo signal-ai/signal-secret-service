@@ -4,7 +4,7 @@ The intention is for all signal secrets to be held in the [AWS SSM key store](ht
 
 Day to day writing and reading secrets from SSM is based around the [chamber tool](https://github.com/segmentio/chamber) written by segmentio.
 
-The principle of this tool is to provide a clear route for a developer or and application to access shared secrets within signal.
+The principle of this tool is to provide a clear route for a developer or an application to access shared secrets within signal.
 
 The chamber wrapper is designed for secret provisioning when executing the entrypoint script in conatiners. It is designed to extrapolate and parse secrets into specific strings needed in execution.
 
