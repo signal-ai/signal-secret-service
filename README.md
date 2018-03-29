@@ -50,6 +50,33 @@ resource "aws_ssm_parameter" "password" {
 }
 ```
 
+Example IAM roles to give a service permisions to read secrets:
+
+```
+module "service-ssm-policy" {
+  name      = "service-ssm-policy"
+  source    = "../modules/iam/role-policy/v1"
+  role_id   = "${module.service.iam_task_role_id}"
+  resources = ["arn:aws:ssm:eu-west-1:*"]
+  actions = [
+    "ssm:getParameters",
+    "ssm:DescribeParameters",
+    "ssm:GetParametersByPath",
+  ]
+  globals = "${local.globals}"
+}
+
+module "service-kms-policy" {
+  name      = "service-kms-policy"
+  source    = "../modules/iam/role-policy/v1"
+  role_id   = "${module.service.iam_task_role_id}"
+  resources = ["${data.terraform_remote_state.core.parameter_store_arn}"]
+  actions = [
+    "kms:Decrypt",
+  ]
+  globals = "${local.globals}"
+}
+```
 #  More detail
 
 As all secrets are stored in AWS SSM parameter store. At the most basic level with appropriate iam permissions a secret can be retieved with the following command using the aws cli.
