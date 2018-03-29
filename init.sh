@@ -11,6 +11,7 @@ chamber_url="https://github.com/segmentio/chamber/releases/download/v${chamber_v
 if [ ! -f "/chamber" ]; then
     echo "Downloading chamber from $chamber_url"
     $curl -L $chamber_url -o /chamber
+    chmod +x /chamber
 fi
 
 if [ $# -eq 0 ]; then
@@ -22,7 +23,7 @@ AWS_REGION=${AWS_REGION:=eu-west-1}
 SECRET_SERVICES=${SECRET_SERVICES:=global}
 export AWS_REGION=$AWS_REGION
 
-function eval_export {
+eval_export() {
     to_export=$1
     keys=$(for v in $to_export ; do echo $v | awk -F '=' '{print $1}' ; done)
     echo $keys
