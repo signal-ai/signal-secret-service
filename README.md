@@ -8,7 +8,7 @@ The principle of this tool is to provide a clear route for a developer or and ap
 
 The chamber wrapper is designed for secret provisioning when executing the entrypoint script in conatiners. It is designed to extrapolate and parse secrets into specific strings needed in execution.
 
-# local use
+## Local Use
 
 ```
 $ brew install chamber
@@ -30,11 +30,11 @@ $ chamber exec service_1 service_2 -- <entrypoint.sh> OVERRIDE_SERVICE_2_SECRET=
 
 For more specific documentation for writing more complex operations see the chamber [documentation](https://github.com/segmentio/chamber)
 
-# container configuration
+## Container Configuration
 
 [TO BE UPDATED]
 
-# terraform:
+## Terraform:
 
 All secrets are encrypted with the KMS key from core: `data.terraform_remote_state.core.parameter_store_alias_arn`
 
@@ -77,7 +77,7 @@ module "service-kms-policy" {
   globals = "${local.globals}"
 }
 ```
-#  more detail
+##  More Detail
 
 As all secrets are stored in AWS SSM parameter store. At the most basic level with appropriate iam permissions a secret can be retieved with the following command using the aws cli.
 
