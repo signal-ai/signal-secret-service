@@ -4,6 +4,10 @@
 # supports ENV overrides and extrapolation.
 # chamber services are exported from ENV $SECRET_SERVICES.
 
+AWS_REGION=${AWS_REGION:=eu-west-1}
+SECRET_SERVICES=${SECRET_SERVICES:=global}
+export AWS_REGION=$AWS_REGION
+
 curl=$(which curl)
 chamber_version="2.0.0"
 chamber_url="https://github.com/segmentio/chamber/releases/download/v${chamber_version}/chamber-v${chamber_version}-linux-amd64"
@@ -19,10 +23,6 @@ if [ $# -eq 0 ]; then
     exit
 fi
 
-AWS_REGION=${AWS_REGION:=eu-west-1}
-SECRET_SERVICES=${SECRET_SERVICES:=global}
-export AWS_REGION=$AWS_REGION
-
 eval_export() {
     to_export=$1
     keys=$(for v in $to_export ; do echo $v | awk -F '=' '{print $1}' ; done)
@@ -35,7 +35,7 @@ echo "Getting ENV variables..."
 original_variables=$(export | awk -F ' ' '{print $3}')
 
 # Call chamber with services from ENV $SECRET_SERVICES and export decrypted ENV variables
-echo "Fetching ENV secrets with chamber..."
+echo "Fetching ENV secrets with chamber for systems $SECRET_SERVICES..."
 to_secrets=$(/chamber export $SECRET_SERVICES -f dotenv | sed 's/\(=[[:blank:]]*\)\(.*\)/\1"\2"/')
 eval_export $to_secrets
 
