@@ -34,11 +34,11 @@ For more specific documentation for writing more complex operations see the cham
 
 [TO BE UPDATED]
 
-# Writing a secret to SSM from terraform:
+# Terraform:
 
 All secrets are encrypted with the KMS key from core: `data.terraform_remote_state.core.parameter_store_alias_arn`
 
-An example:
+An example of writing a secret to SSM from terraform:
 
 ```
 resource "aws_ssm_parameter" "password" {
