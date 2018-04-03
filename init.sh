@@ -1,4 +1,7 @@
 #!/bin/sh
+#
+# Copyright 2018 Signal Media Ltd
+#
 # This is a wrapper for chamber to be used under a Docker container.
 # Uses chamber do fetch ENV secrets from EC2 Parameter Store and
 # supports ENV overrides and extrapolation.

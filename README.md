@@ -3,7 +3,7 @@
 `init.sh` is a wrapper for extracting secrets into Docker containers from AWS SSM before the application starts. It uses [chamber](https://github.com/segmentio/chamber) to fetch secrets and supports ENV variable extrapolation and overrides.
 It has been designed to work with AWS ECS.
 
-The intention is for all secrets to be held in the [AWS SSM key store](https://eu-west-1.console.aws.amazon.com/ec2/v2/home?region=eu-west-1#Parameters:sort=Name). It provides encryption, audit and the ability for secret rotation.
+The intention is for all secrets to be held in the [AWS SSM key store](https://eu-west-1.console.aws.amazon.com/ec2/v2/home?region=eu-west-1#Parameters:sort=Name). AWS SSM provides encryption, audit and the ability for secret rotation.
 
 ## Local Use
 
@@ -191,10 +191,10 @@ Replace `arn:aws:ssm:eu-west-1:123456123:parameter/*` with specific parameter ac
 [Controlling Access to Systems Manager Parameters](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html)
 `${aws_kms_key.parameter_store.arn}` is your parameter store key KMS arn.
 
-##  More Detail
+## Troubleshooting without chamber
 
 As all secrets are stored in AWS SSM parameter store. At the most basic level with appropriate IAM permissions a secret can be retieved with the following command using the AWS cli:
 
 ```
-$ aws ssm get-parameters --names my_db_password --with-decryption | jq -r '.Parameters[0].Value'
+$ aws ssm get-parameters-by-path --path /service/secret_key --with-decryption | jq -r '.Parameters[0].Value'
 ```
