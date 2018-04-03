@@ -117,10 +117,10 @@ within your app, we can set the value as "SECRET", although there is no need to 
 ```
 
 Both `ADMIN_PASSWORD` and `API_TOKEN` are stored under prod-my-app service while `DB_PASSWORD` is stored under prod-my-db (via Terraform). To
-get a list of all ENV variables stored for a given system, please do locally:
+get a list of all ENV variables stored for a given service, please do locally:
 
 ```
-chamber exec system -- env
+chamber exec service -- env
 ```
 
 ENV variable extrapolation is supported. For example, if you want to use the value of DB_PASSWORD to set DB_URL, you can:
