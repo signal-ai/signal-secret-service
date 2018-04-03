@@ -1,6 +1,6 @@
 # signal-secret-service
 
-init.sh is a wrapper for extracting secrets into Docker containers from AWS SSM before the application starts. It uses [chamber](https://github.com/segmentio/chamber) to fetch secrets and supports ENV variable extrapolation and overrides.
+`init.sh` is a wrapper for extracting secrets into Docker containers from AWS SSM before the application starts. It uses [chamber](https://github.com/segmentio/chamber) to fetch secrets and supports ENV variable extrapolation and overrides.
 It has been designed to work with AWS ECS.
 
 The intention is for all secrets to be held in the [AWS SSM key store](https://eu-west-1.console.aws.amazon.com/ec2/v2/home?region=eu-west-1#Parameters:sort=Name). It provides encryption, audit and the ability for secret rotation.
@@ -18,25 +18,27 @@ $ chamber write <service> <key> <value>
 ```
 
 If `-` is provided as the `<value>` argument, the value will be read from standard
-input. You will also need to provide AWS keys or export your profile through AWS_PROFILE ENV variable.
+input. You will also need to provide AWS keys or export your profile through `AWS_PROFILE` ENV variable.
 
 An example command for collecting secrets for multiple services and optionaly overriding one of those secrets from service_2 for a specific entry point:
 ```
 $ chamber exec service_1 service_2 -- <entrypoint.sh> SERVICE_2_SECRET=123456
 ```
 
-For more specific documentation for writing more complex operations see the chamber [documentation](https://github.com/segmentio/chamber)
+For more specific documentation for writing more complex operations see the chamber [documentation](https://github.com/segmentio/chamber).
 
 ## Container Configuration
 
-To install the wrapper into your Docker container, please add the following to your Dockerfile:
+### Building your container with `init.sh`
+
+To install the `init.sh` wrapper into your Docker container, please add the following to your Dockerfile:
 ```
 ADD https://raw.githubusercontent.com/SignalMedia/signal-secret-service/master/init.sh /
 RUN chmod +x /init.sh && /init.sh
 ```
 
-The init.sh script will retrieve chamber's linux 64bit binary into / with curl. curl should be available in most Docker images. For Alpine Linux,
-please add curl as a base package with:
+The `init.sh` wrapper installs chamber's linux 64bit binary into / with `curl`. `curl` should be available in most Docker images. For Alpine Linux,
+please add `curl` as a package with:
 
 ```
 RUN apk add curl
@@ -63,10 +65,82 @@ ENTRYPOINT ["/init.sh", "python", "-u", "my_app.py"]
 
 Both shell and exec forms should work.
 
-init.sh will output information regarding what chamber services were used and what keys were extracted during initialization. Check
+`init.sh` will output information regarding what chamber services were used and what keys were extracted during initialization. Check
 stdout (ECS/CloudWatch) for more info.
 
-## Infrastructure config and EC2/ECS policy configuration.
+### ECS Task definition
+
+When deploying your application, you will need to pass the services that you want chamber to decrypt secrets from. You can do this by setting the
+ENV variable `SECRET_SERVICES`. Example:
+
+`SECRET_SERVICES=prod-my-app prod-my-db`
+
+This will tell `init.sh` to decrypt secrets for services prod-my-app and prod-my-db using `chamber`. If you want to track all secret ENV variables
+within your app, we can set the value as "SECRET". This can make it easier to track or have a list of all secrets but there is no need to
+do it since this value will always be overriden by `chamber`. ECS Task definition example:
+
+```JSON
+{
+  "taskDefinition": {
+    "family": "prod-my-app",
+    "volumes": [
+    ],
+    "containerDefinitions": [
+      {
+        "mountPoints": [],
+        "environment": [
+          {"name": "ADMIN_PASSWORD", "value": "SECRET"},
+          {"name": "API_TOKEN", "value": "SECRET"},
+          {"name": "SOME_ENV", "value": "notasecret"},
+          {"name": "DB_PASSWORD", "value": "SECRET"},
+          {"name": "SECRET_SERVICES", "value": "prod-my-app prod-my-db"}
+        ],
+        "image": "repo.com/account/prod-my-app",
+        "portMappings": [
+          {"containerPort": 8000, "hostPort": 8000}
+        ],
+        "essential": true,
+        "cpu": 512,
+        "volumesFrom": [],
+        "memory": 200,
+        "logConfiguration": {
+          "options": {
+            "awslogs-group": "prod-my-app",
+            "awslogs-region": "eu-west-1"
+          },
+          "logDriver": "awslogs"
+        },
+        "name": "application"
+      }
+    ]
+  }
+}
+```
+
+Both `ADMIN_PASSWORD` and `API_TOKEN` are stored under prod-my-app service while `DB_PASSWORD` is stored under prod-my-db (via Terraform). To
+get a list of all ENV variables stored for a given system, please do locally:
+
+```
+chamber exec system -- env
+```
+
+ENV variable extrapolation is supported. For example, if you want to use the value of DB_PASSWORD to set DB_URL, you can:
+
+```
+{"name": "DB_URL", "value": "postgres://rdsuser:$DB_PASSWORD@my-db-instance/db_name"},
+```
+
+ENV variable secrets can be overwritten. For example, if we use a different API_TOKEN locally or if we are using a local DB for which we will
+use docker-compose, we can set:
+
+```
+API_TOKEN="123123123"
+DB_PASSWORD="local_secret"
+```
+
+`init.sh` will always call the override of any secret if original value is not "SECRET".
+
+## Terraform and EC2/ECS policy configuration.
 
 Following chamber's best practices, all secrets are encrypted with the KMS alias parameter_store_key.
 
@@ -89,7 +163,7 @@ Example IAM roles to give an ECS task permissions to read secrets using Terrafor
 ```HCL
 resource "aws_iam_role_policy" "policy-ssm" {
   name = "role-policy-ssm"
-  role = "${iam_task_role_id}"
+  role = "${aws_iam_role.task_role.id}""
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -114,9 +188,9 @@ EOF
 }
 ```
 
-Replace "arn:aws:ssm:eu-west-1:123456123:parameter/\*" with specific parameter access you want to give to your ECS task. For more information, please check 
+Replace `arn:aws:ssm:eu-west-1:123456123:parameter/*` with specific parameter access you want to give to your ECS task. For more information, please check 
 [Controlling Access to Systems Manager Parameters](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html)
-${aws_kms_key.parameter_store.arn} is your parameter store key KMS arn.
+`${aws_kms_key.parameter_store.arn}` is your parameter store key KMS arn.
 
 ##  More Detail
 
