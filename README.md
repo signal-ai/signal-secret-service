@@ -72,7 +72,7 @@ Following chamber's best practices, all secrets are encrypted with the KMS alias
 
 An example of writing a secret to SSM from Terraform:
 
-```
+```HCL
 resource "aws_ssm_parameter" "password" {
   name      = "my_db_password"
   value     = "some_secret"
@@ -86,7 +86,7 @@ Where ${var.parameter_store_alias_arn} is a variable pointing to your parameter_
 
 Example IAM roles to give an ECS task permissions to read secrets using Terraform:
 
-```
+```HCL
 resource "aws_iam_role_policy" "policy-ssm" {
   name = "role-policy-ssm"
   role = "${iam_task_role_id}"
@@ -101,7 +101,7 @@ resource "aws_iam_role_policy" "policy-ssm" {
         "ssm:GetParametersByPath"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:ssm:us-east-1:123456123:parameter/prod-*"
+      "Resource": "arn:aws:ssm:eu-west-1:123456123:parameter/*"
     },
     {
       "Action": "kms:Decrypt",
@@ -114,7 +114,7 @@ EOF
 }
 ```
 
-Replace "arn:aws:ssm:us-east-1:123456123:parameter/prod-\*" with specific parameter access you want to give to your ECS task. For more information, please check 
+Replace "arn:aws:ssm:eu-west-1:123456123:parameter/\*" with specific parameter access you want to give to your ECS task. For more information, please check 
 [Controlling Access to Systems Manager Parameters](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html)
 ${aws_kms_key.parameter_store.arn} is your parameter store key KMS arn.
 
