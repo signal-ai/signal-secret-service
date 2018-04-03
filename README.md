@@ -75,9 +75,8 @@ ENV variable `SECRET_SERVICES`. Example:
 
 `SECRET_SERVICES=prod-my-app prod-my-db`
 
-This will tell `init.sh` to decrypt secrets for services prod-my-app and prod-my-db using `chamber`. If you want to track all secret ENV variables
-within your app, we can set the value as "SECRET". This can make it easier to track or have a list of all secrets but there is no need to
-do it since this value will always be overriden by `chamber`. ECS Task definition example:
+This will tell `init.sh` to decrypt secrets for services prod-my-app and prod-my-db using `chamber`. If you want to keep a reference of secret ENV variables
+within your app, we can set the value as "SECRET", although there is no need to do that for chamber to extract secrets. Example JSON for ECS task definition:
 
 ```JSON
 {
