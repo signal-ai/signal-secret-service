@@ -41,7 +41,7 @@ The `init.sh` wrapper installs chamber's linux 64bit binary into / with `curl`. 
 please add `curl` as a package with:
 
 ```
-RUN apk add curl
+RUN apk --update add curl
 ADD https://raw.githubusercontent.com/SignalMedia/signal-secret-service/master/init.sh /
 RUN chmod +x /init.sh && /init.sh
 ```
