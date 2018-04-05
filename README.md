@@ -156,7 +156,7 @@ Example IAM roles to give an ECS task permissions to read secrets using Terrafor
 ```HCL
 resource "aws_iam_role_policy" "policy-ssm" {
   name = "role-policy-ssm"
-  role = "${aws_iam_role.task_role.id}""
+  role = "${aws_iam_role.task_role.id}"
   policy = <<EOF
 {
   "Version": "2012-10-17",
