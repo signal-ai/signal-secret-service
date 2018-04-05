@@ -3,7 +3,7 @@
 # Copyright 2018 Signal Media Ltd
 #
 # This is a wrapper for chamber to be used under a Docker container.
-# Uses chamber do fetch ENV secrets from EC2 Parameter Store and
+# Uses chamber do fetch ENV secrets from AWS SSM Parameter Store and
 # supports ENV overrides and extrapolation.
 # chamber services are exported from ENV $SECRET_SERVICES.
 
@@ -15,9 +15,19 @@ curl=$(which curl)
 chamber_version="2.0.0"
 chamber_url="https://github.com/segmentio/chamber/releases/download/v${chamber_version}/chamber-v${chamber_version}-linux-amd64"
 
+if [ ! "$curl" ]; then
+    if [ -f "/etc/alpine-release" ]; then
+        echo "Alpine Linux detected. Installing curl..."
+        apk --update add curl
+    else
+       echo "No curl installed. chamber will not be downloaded."
+       exit
+    fi
+fi
+
 if [ ! -f "/chamber" ]; then
     echo "Downloading chamber from $chamber_url"
-    $curl -L $chamber_url -o /chamber
+    curl -L $chamber_url -o /chamber
     chmod +x /chamber
 fi
 

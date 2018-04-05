@@ -38,19 +38,13 @@ RUN chmod +x /init.sh && /init.sh
 ```
 
 The `init.sh` wrapper installs chamber's linux 64bit binary into / with `curl`. `curl` should be available in most Docker images. For Alpine Linux,
-please add `curl` as a package with:
+this package will be automatically installed. For other minimal Linux images, please add it before calling `init.sh`.
 
+In alternative, you could directly install chamber with Docker:
 ```
-RUN apk --update add curl
+ADD https://github.com/segmentio/chamber/releases/download/v2.0.0/chamber-v2.0.0-linux-amd64 /chamber
 ADD https://raw.githubusercontent.com/SignalMedia/signal-secret-service/master/init.sh /
-RUN chmod +x /init.sh && /init.sh
-```
-
-In alternative, you could directly install chamber with Docker with:
-```
-ADD https://github.com/segmentio/chamber/releases/download/v2.0.0/chamber-v2.0.0-linux-amd64
-ADD https://raw.githubusercontent.com/SignalMedia/signal-secret-service/master/init.sh /
-RUN chmod +x /init.sh && /init.sh
+RUN chmod +x /init.sh && chmod +x /chamber
 ```
 
 To extract secrets during runtime, you just need to modify your ENTRYPOINT (or CMD if no ENTRYPOINT is used) to run init.sh before calling your app:
