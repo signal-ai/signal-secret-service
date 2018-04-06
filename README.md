@@ -3,7 +3,7 @@
 `init.sh` is a wrapper for extracting secrets into Docker containers from AWS SSM before the application starts. It uses [chamber](https://github.com/segmentio/chamber) to fetch secrets and supports ENV variable extrapolation and overrides.
 It has been designed to work with AWS ECS.
 
-The intention is for all secrets to be held in the [AWS SSM key store](https://eu-west-1.console.aws.amazon.com/ec2/v2/home?region=eu-west-1#Parameters:sort=Name). AWS SSM provides encryption, audit and the ability for secret rotation.
+The intention is for all secrets to be held in the [AWS SSM key store](https://eu-west-1.console.aws.amazon.com/ec2/v2/home?region=eu-west-1#Parameters:sort=Name). AWS SSM provides encryption and audit.
 
 ## Local Use
 
