@@ -8,21 +8,31 @@ The intention is for all secrets to be held in the [AWS SSM key store](https://e
 ## Local Use
 
 For Mac OS X users, you can use brew:
+
+```sh
+brew install chamber
 ```
-$ brew install chamber
+
+Ensure that the following enviroment variables are exported for your region of choice (can be added to bash_profile):
+
+```sh
+export AWS_DEFAULT_REGION=eu-west-1
+export AWS_REGION=eu-west-1
 ```
 
 An example command to write a secret to SSM for a specific service:
-```
-$ chamber write <service> <key> <value>
+
+```sh
+chamber write <service> <key> <value>
 ```
 
 If `-` is provided as the `<value>` argument, the value will be read from standard
 input. You will also need to provide AWS keys or export your profile through `AWS_PROFILE` ENV variable.
 
 An example command for collecting secrets for multiple services and optionaly overriding one of those secrets from service_2 for a specific entry point:
-```
-$ chamber exec service_1 service_2 -- <entrypoint.sh> SERVICE_2_SECRET=123456
+
+```sh
+chamber exec service_1 service_2 -- <entrypoint.sh> SERVICE_2_SECRET=123456
 ```
 
 For more specific documentation for writing more complex operations see the chamber [documentation](https://github.com/segmentio/chamber).
@@ -32,7 +42,8 @@ For more specific documentation for writing more complex operations see the cham
 ### Building your container with `init.sh`
 
 To install the `init.sh` wrapper into your Docker container, please add the following to your Dockerfile:
-```
+
+```sh
 ADD https://raw.githubusercontent.com/SignalMedia/signal-secret-service/master/init.sh /
 RUN chmod +x /init.sh && /init.sh
 ```
@@ -41,19 +52,22 @@ The `init.sh` wrapper installs chamber's linux 64bit binary into / with `curl`. 
 this package will be automatically installed. For other minimal Linux images, please add it before calling `init.sh`.
 
 In alternative, you could directly install chamber with Docker:
-```
+
+```sh
 ADD https://github.com/segmentio/chamber/releases/download/v2.0.0/chamber-v2.0.0-linux-amd64 /chamber
 ADD https://raw.githubusercontent.com/SignalMedia/signal-secret-service/master/init.sh /
 RUN chmod +x /init.sh && chmod +x /chamber
 ```
 
 To extract secrets during runtime, you just need to modify your ENTRYPOINT (or CMD if no ENTRYPOINT is used) to run init.sh before calling your app:
-```
+
+```sh
 ENTRYPOINT ["/init.sh", "/myapp"]
 ```
 
 It will also work if you have multiple arguments in use by your app:
-```
+
+```sh
 ENTRYPOINT ["/init.sh", "python", "-u", "my_app.py"]
 ```
 
@@ -113,27 +127,27 @@ within your app, we can set the value as "SECRET", although there is no need to 
 Both `ADMIN_PASSWORD` and `API_TOKEN` are stored under prod-my-app service while `DB_PASSWORD` is stored under prod-my-db (via Terraform). To
 get a list of all ENV variables stored for a given service, please do locally:
 
-```
+```sh
 chamber exec service -- env
 ```
 
 ENV variable extrapolation is supported. For example, if you want to use the value of DB_PASSWORD to set DB_URL, you can:
 
-```
+```sh
 {"name": "DB_URL", "value": "postgres://rdsuser:$DB_PASSWORD@my-db-instance/db_name"},
 ```
 
 ENV variable secrets can be overwritten. For example, if we use a different API_TOKEN locally or if we are using a local DB for which we will
 use docker-compose, we can set:
 
-```
+```sh
 API_TOKEN="123123123"
 DB_PASSWORD="local_secret"
 ```
 
 `init.sh` will always call the override of any secret if original value is not "SECRET".
 
-## Terraform and EC2/ECS policy configuration.
+## Terraform and EC2/ECS policy configuration
 
 Following chamber's best practices, all secrets are encrypted with the KMS alias parameter_store_key.
 
@@ -181,7 +195,7 @@ EOF
 }
 ```
 
-Replace `arn:aws:ssm:eu-west-1:123456123:parameter/*` with specific parameter access you want to give to your ECS task. For more information, please check 
+Replace `arn:aws:ssm:eu-west-1:123456123:parameter/*` with specific parameter access you want to give to your ECS task. For more information, please check
 [Controlling Access to Systems Manager Parameters](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html)
 `${aws_kms_key.parameter_store.arn}` is your parameter store key KMS arn.
 
@@ -189,6 +203,6 @@ Replace `arn:aws:ssm:eu-west-1:123456123:parameter/*` with specific parameter ac
 
 As all secrets are stored in AWS SSM parameter store. At the most basic level with appropriate IAM permissions a secret can be retieved with the following command using the AWS cli:
 
-```
-$ aws ssm get-parameters-by-path --path /service/secret_key --with-decryption | jq -r '.Parameters[0].Value'
+```sh
+aws ssm get-parameters-by-path --path /service/secret_key --with-decryption | jq -r '.Parameters[0].Value'
 ```
