@@ -11,11 +11,13 @@ AWS_REGION=${AWS_REGION:=eu-west-1}
 SECRET_SERVICES=${SECRET_SERVICES:=global}
 export AWS_REGION=$AWS_REGION
 
-curl=$(which curl)
 chamber_version="2.0.0"
 chamber_url="https://github.com/segmentio/chamber/releases/download/v${chamber_version}/chamber-v${chamber_version}-linux-amd64"
 
-if [ ! "$curl" ]; then
+# Install chamber using curl
+curl -V > /dev/null 2>&1
+curl_status=$?
+if [ $curl_status = 127 ]; then
     if [ -f "/etc/alpine-release" ]; then
         echo "Alpine Linux detected. Installing curl..."
         apk --update add curl
