@@ -70,4 +70,4 @@ if [ ! -z "$to_extrapolate" -a "$to_extrapolate" != " " ]; then
 fi
 
 echo "Starting $@..."
-"$@"
+exec "$@"
