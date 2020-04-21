@@ -23,13 +23,18 @@ if [ $curl_status = 127 ]; then
         apk --update add curl
     else
        echo "No curl installed. chamber will not be downloaded."
-       exit
+       exit 1
     fi
 fi
 
 if [ ! -f "/chamber" ]; then
     echo "Downloading chamber from $chamber_url"
-    curl -L $chamber_url -o /chamber
+    curl -f -L $chamber_url -o /chamber
+    curl_status=$?
+    if [ $curl_status != 0 ]; then
+        echo "Could not download chamber."
+        exit 1
+    fi
     chmod +x /chamber
 fi
 
