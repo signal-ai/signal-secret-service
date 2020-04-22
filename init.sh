@@ -67,7 +67,7 @@ original_variables=$(export | cut -f2 -d ' ')
 # Call chamber with services from ENV $SECRET_SERVICES and export decrypted ENV variables
 echo "Fetching ENV secrets with chamber for systems $SECRET_SERVICES..."
 
-secret_env=$(/tmp/chamber export $SECRET_SERVICES -f dotenv)
+secret_env=$(/chamber export $SECRET_SERVICES -f dotenv)
 
 chamber_result=$?
 if [ $chamber_result != 0 ]; then
