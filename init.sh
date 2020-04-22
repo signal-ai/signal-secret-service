@@ -13,6 +13,10 @@ export AWS_REGION=$AWS_REGION
 
 chamber_version="2.0.0"
 chamber_url="https://github.com/segmentio/chamber/releases/download/v${chamber_version}/chamber-v${chamber_version}-linux-amd64"
+chamber_checksum='bdff59df90a135ea485f9ce5bcfed2b3b1cc9129840f08ef9f0ab5309511b224  /chamber'
+
+
+echo "$chamber_checksum" > /sha256sum.txt
 
 # Install chamber using curl
 curl -V > /dev/null 2>&1
@@ -33,6 +37,12 @@ if [ ! -f "/chamber" ]; then
     curl_status=$?
     if [ $curl_status != 0 ]; then
         echo "Could not download chamber."
+        exit 1
+    fi
+    sha256sum -c /sha256sum.txt
+    checksum_status=$?
+    if [ $checksum_status != 0 ]; then
+        echo "Checksum failed"
         exit 1
     fi
     chmod +x /chamber

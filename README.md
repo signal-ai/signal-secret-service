@@ -206,3 +206,6 @@ As all secrets are stored in AWS SSM parameter store. At the most basic level wi
 ```sh
 aws ssm get-parameters-by-path --path /service/secret_key --with-decryption | jq -r '.Parameters[0].Value'
 ```
+## Local testing
+
+Run `docker build -t test .` to test build init.sh with alpine. You can change the base image in Dockerfile.
