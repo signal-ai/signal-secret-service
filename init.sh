@@ -66,7 +66,16 @@ original_variables=$(export | cut -f2 -d ' ')
 
 # Call chamber with services from ENV $SECRET_SERVICES and export decrypted ENV variables
 echo "Fetching ENV secrets with chamber for systems $SECRET_SERVICES..."
-to_secrets=$(/chamber export $SECRET_SERVICES -f dotenv | sed 's/\(=[[:blank:]]*\)\(.*\)/\1"\2"/')
+
+secret_env=$(/tmp/chamber export $SECRET_SERVICES -f dotenv)
+
+chamber_result=$?
+if [ $chamber_result != 0 ]; then
+    echo "Chamber failed to get secrets for service: $SECRET_SERVICES"
+    exit 1
+fi
+
+to_secrets=$(echo "$secret_env" | sed 's/\(=[[:blank:]]*\)\(.*\)/\1"\2"/')
 eval_export $to_secrets
 
 # Perform overrides
