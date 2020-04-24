@@ -16,7 +16,6 @@ chamber_url="https://github.com/segmentio/chamber/releases/download/v${chamber_v
 chamber_checksum='bdff59df90a135ea485f9ce5bcfed2b3b1cc9129840f08ef9f0ab5309511b224  /chamber'
 
 
-echo "$chamber_checksum" > /sha256sum.txt
 
 # Install chamber using curl
 curl -V > /dev/null 2>&1
@@ -33,6 +32,7 @@ fi
 
 if [ ! -f "/chamber" ]; then
     echo "Downloading chamber from $chamber_url"
+    echo "$chamber_checksum" > /sha256sum.txt
     curl -f -L $chamber_url -o /chamber
     curl_status=$?
     if [ $curl_status != 0 ]; then
