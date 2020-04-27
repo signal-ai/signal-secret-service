@@ -16,7 +16,6 @@ chamber_url="https://github.com/segmentio/chamber/releases/download/v${chamber_v
 chamber_checksum='bdff59df90a135ea485f9ce5bcfed2b3b1cc9129840f08ef9f0ab5309511b224  /chamber'
 
 
-
 # Install chamber using curl
 curl -V > /dev/null 2>&1
 curl_status=$?
@@ -66,7 +65,22 @@ original_variables=$(export | cut -f2 -d ' ')
 
 # Call chamber with services from ENV $SECRET_SERVICES and export decrypted ENV variables
 echo "Fetching ENV secrets with chamber for systems $SECRET_SERVICES..."
-to_secrets=$(/chamber export $SECRET_SERVICES -f dotenv | sed 's/\(=[[:blank:]]*\)\(.*\)/\1"\2"/')
+
+secret_env=$(/chamber export $SECRET_SERVICES -f dotenv)
+
+chamber_result=$?
+
+if [ $chamber_result != 0 ]; then
+    echo "Chamber failed to get secrets for service: $SECRET_SERVICES"
+    if [ ! -z $AWS_EXECUTION_ENV ]; then
+        echo "Running in AWS. Exiting."
+        exit 1
+    fi
+fi
+
+to_secrets=$(echo "$secret_env" | sed 's/\(=[[:blank:]]*\)\(.*\)/\1"\2"/')
+
+
 eval_export $to_secrets
 
 # Perform overrides
