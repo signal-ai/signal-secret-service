@@ -6,14 +6,14 @@ there's less overhead as possible when copied to a Docker container.
 
 To download chamber and compress it:
 
-``sh
+```sh
 make build
-``
+```
 
 To get latest binary and sha256sum copied to current directory:
 
-``sh
+```sh
 make get-chamber-upx
-``
+```
 
 Requirements: Docker.
