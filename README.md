@@ -1,7 +1,6 @@
 # signal-secret-service
 
-`init.sh` is a wrapper for extracting secrets into Docker containers from AWS SSM before the application starts. It uses [chamber](https://github.com/segmentio/chamber) to fetch secrets and supports ENV variable extrapolation and overrides.
-It has been designed to work with AWS ECS.
+`init.sh` is a wrapper for extracting secrets into Docker containers from AWS SSM's Parameter Store before the application starts. It uses a [compressed](https://github.com/signal-ai/signal-secret-service/tree/master/chamber-upx) [chamber](https://github.com/segmentio/chamber) binary to fetch secrets and supports ENV variable extrapolation and overrides. It has been designed to work with AWS ECS.
 
 The intention is for all secrets to be held in the [AWS SSM key store](https://eu-west-1.console.aws.amazon.com/ec2/v2/home?region=eu-west-1#Parameters:sort=Name). AWS SSM provides encryption and audit.
 
@@ -29,7 +28,7 @@ chamber write <service> <key> <value>
 If `-` is provided as the `<value>` argument, the value will be read from standard
 input. You will also need to provide AWS keys or export your profile through `AWS_PROFILE` ENV variable.
 
-An example command for collecting secrets for multiple services and optionaly overriding one of those secrets from service_2 for a specific entry point:
+An example command for collecting secrets for multiple services and optionally overriding one of those secrets from service_2 for a specific entry point:
 
 ```sh
 chamber exec service_1 service_2 -- <entrypoint.sh> SERVICE_2_SECRET=123456
@@ -54,7 +53,7 @@ this package will be automatically installed. For other minimal Linux images, pl
 In alternative, you could directly install chamber with Docker:
 
 ```sh
-ADD https://github.com/segmentio/chamber/releases/download/v2.0.0/chamber-v2.0.0-linux-amd64 /chamber
+ADD https://github.com/signal-ai/signal-secret-service/raw/master/chamber-upx/chamber-v2.8.1 /chamber
 ADD https://raw.githubusercontent.com/SignalMedia/signal-secret-service/master/init.sh /
 RUN chmod +x /init.sh && chmod +x /chamber
 ```

@@ -11,9 +11,9 @@ AWS_REGION=${AWS_REGION:=eu-west-1}
 SECRET_SERVICES=${SECRET_SERVICES:=global}
 export AWS_REGION=$AWS_REGION
 
-chamber_version="2.0.0"
-chamber_url="https://github.com/segmentio/chamber/releases/download/v${chamber_version}/chamber-v${chamber_version}-linux-amd64"
-chamber_checksum='bdff59df90a135ea485f9ce5bcfed2b3b1cc9129840f08ef9f0ab5309511b224  /chamber'
+chamber_version="2.8.1"
+chamber_url="https://github.com/signal-ai/signal-secret-service/raw/master/chamber-upx/chamber-v${chamber_version}"
+chamber_checksum='48e2fe0c2111f82ab2899d00d7a7b4c850a7b2c79e95cdbf85d606b1acc41798  /chamber'
 
 
 # Install chamber using curl
@@ -66,7 +66,7 @@ original_variables=$(export | cut -f2 -d ' ')
 # Call chamber with services from ENV $SECRET_SERVICES and export decrypted ENV variables
 echo "Fetching ENV secrets with chamber for systems $SECRET_SERVICES..."
 
-secret_env=$(/chamber export $SECRET_SERVICES -f dotenv)
+to_secrets=$(/chamber export $SECRET_SERVICES -f dotenv)
 
 chamber_result=$?
 
@@ -77,9 +77,6 @@ if [ $chamber_result != 0 ]; then
         exit 1
     fi
 fi
-
-to_secrets=$(echo "$secret_env" | sed 's/\(=[[:blank:]]*\)\(.*\)/\1"\2"/')
-
 
 eval_export $to_secrets
 
