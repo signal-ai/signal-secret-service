@@ -66,8 +66,9 @@ original_variables=$(export | cut -f2 -d ' ')
 # Call chamber with services from ENV $SECRET_SERVICES and export decrypted ENV variables
 echo "Fetching ENV secrets with chamber for systems $SECRET_SERVICES..."
 
-to_secrets=$(/chamber export $SECRET_SERVICES -f dotenv)
-
+# We have to loop through $SECRET_SERVICES because 'chamber env' doesn't support
+# multiple services
+chamber_env=$(for s in $SECRET_SERVICES ; do /chamber env $s ; done)
 chamber_result=$?
 
 if [ $chamber_result != 0 ]; then
@@ -78,6 +79,7 @@ if [ $chamber_result != 0 ]; then
     fi
 fi
 
+to_secrets=$(echo $chamber_env | sed 's/export //g')
 eval_export $to_secrets
 
 # Perform overrides
