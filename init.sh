@@ -79,7 +79,8 @@ if [ $chamber_result != 0 ]; then
     fi
 fi
 
-to_secrets=$(echo $chamber_env | sed 's/export //g')
+# We want to remove 'export' from the env output and also convert - into _ for env names
+to_secrets=$(echo $chamber_env | sed 's/export //g' | for e in $(cat -) ; do echo $e | awk '{ gsub("-", "_", $1) } 1' FS='=' OFS='='; done)
 eval_export $to_secrets
 
 # Perform overrides
