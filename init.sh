@@ -80,7 +80,7 @@ echo "Fetching ENV secrets with chamber for systems $SECRET_SERVICES..."
 
 # We have to loop through $SECRET_SERVICES because 'chamber env' doesn't support
 # multiple services
-chamber_env=$(for s in $SECRET_SERVICES ; do /chamber env $s ; done)
+chamber_env=$(for s in $SECRET_SERVICES ; do /chamber env $s || rc=$? ; done ; exit $rc)
 chamber_result=$?
 
 if [ $chamber_result != 0 ]; then
