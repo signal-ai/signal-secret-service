@@ -71,6 +71,12 @@ eval_export() {
     eval export $to_export
 }
 
+if [ -n SKIP_SIGNAL_SECRET_SERVICE ]; then
+    echo "Skipping secrets fetch with chamber as SKIP_SIGNAL_SECRET_SERVICE was set"
+    echo "Starting $@..."
+    exec "$@"
+fi
+
 # Get list of ENV variables injected by Docker
 echo "Getting ENV variables..."
 original_variables=$(export | cut -f2 -d ' ')
