@@ -6,13 +6,13 @@ The intention is for all secrets to be held in the [AWS SSM key store](https://e
 
 ## Local Use
 
-For Mac OS X users, you can use brew:
+For Mac OS users, you can use Homebrew:
 
 ```sh
 brew install chamber
 ```
 
-Ensure that the following enviroment variables are exported for your region of choice (can be added to bash_profile):
+Ensure that the following enviroment variables are exported for your region of choice (can be added to your `~/.bash_profile` or equivalent):
 
 ```sh
 export AWS_DEFAULT_REGION=eu-west-1
@@ -40,40 +40,39 @@ For more specific documentation for writing more complex operations see the cham
 
 ### Building your container with `init.sh`
 
-To install the `init.sh` wrapper into your Docker container, please add the following to your Dockerfile:
+It's recommended to rename the `init.sh` script to something obvious for the Dockerfile consumer, e.g. `signal-secret-service.sh`. To install the `init.sh` wrapper into your Docker container, please add the following to your Dockerfile:
 
 ```sh
-ADD https://raw.githubusercontent.com/SignalMedia/signal-secret-service/master/init.sh /
-RUN chmod +x /init.sh && /init.sh
+ADD https://raw.githubusercontent.com/signal-ai/signal-secret-service/master/init.sh /signal-secret-service.sh
+RUN chmod +x /signal-secret-service.sh && /signal-secret-service.sh
 ```
 
-The `init.sh` wrapper installs chamber's linux 64bit binary into / with `curl`. `curl` should be available in most Docker images. For Alpine Linux,
+The `init.sh` wrapper installs chamber's linux 64-bit binary into / with `curl`. `curl` should be available in most Docker images. For Alpine Linux,
 this package will be automatically installed. For other minimal Linux images, please add it before calling `init.sh`.
 
 In alternative, you could directly install chamber with Docker:
 
 ```sh
 ADD https://github.com/signal-ai/signal-secret-service/raw/master/chamber-upx/chamber-v2.8.1 /chamber
-ADD https://raw.githubusercontent.com/SignalMedia/signal-secret-service/master/init.sh /
-RUN chmod +x /init.sh && chmod +x /chamber
+ADD https://raw.githubusercontent.com/signal-ai/signal-secret-service/master/init.sh /signal-secret-service.sh
+RUN chmod +x /signal-secret-service.sh && chmod +x /chamber
 ```
 
-To extract secrets during runtime, you just need to modify your ENTRYPOINT (or CMD if no ENTRYPOINT is used) to run init.sh before calling your app:
+To extract secrets during runtime, you just need to modify your `ENTRYPOINT` (or `CMD` if no `ENTRYPOINT` is used) to run `/signal-secret-service.sh` before calling your app:
 
 ```sh
-ENTRYPOINT ["/init.sh", "/myapp"]
+ENTRYPOINT ["/signal-secret-service.sh", "/myapp"]
 ```
 
 It will also work if you have multiple arguments in use by your app:
 
 ```sh
-ENTRYPOINT ["/init.sh", "python", "-u", "my_app.py"]
+ENTRYPOINT ["/signal-secret-service.sh", "python", "-u", "my_app.py"]
 ```
 
 Both shell and exec forms should work.
 
-`init.sh` will output information regarding what chamber services were used and what keys were extracted during initialization. Check
-stdout (ECS/CloudWatch) for more info.
+`init.sh` will output information regarding what chamber services were used and what keys were extracted during initialization. Check stdout (ECS/CloudWatch) for more info.
 
 ### ECS Task definition
 
@@ -83,7 +82,7 @@ ENV variable `SECRET_SERVICES`. Example:
 `SECRET_SERVICES=prod-my-app prod-my-db`
 
 This will tell `init.sh` to decrypt secrets for services prod-my-app and prod-my-db using `chamber`. If you want to keep a reference of secret ENV variables
-within your app, we can set the value as "SECRET", although there is no need to do that for chamber to extract secrets. Example JSON for ECS task definition:
+within your app, we can set the value as `SECRET`, although there is no need to do that for chamber to extract secrets. Example JSON for ECS task definition:
 
 ```JSON
 {
@@ -123,20 +122,20 @@ within your app, we can set the value as "SECRET", although there is no need to 
 }
 ```
 
-Both `ADMIN_PASSWORD` and `API_TOKEN` are stored under prod-my-app service while `DB_PASSWORD` is stored under prod-my-db (via Terraform). To
+Both `ADMIN_PASSWORD` and `API_TOKEN` are stored under prod-my-app service while `DB_PASSWORD` is stored under `prod-my-db` (via Terraform). To
 get a list of all ENV variables stored for a given service, please do locally:
 
 ```sh
 chamber exec service -- env
 ```
 
-ENV variable extrapolation is supported. For example, if you want to use the value of DB_PASSWORD to set DB_URL, you can:
+ENV variable extrapolation is supported. For example, if you want to use the value of `DB_PASSWORD` to set `DB_URL`, you can:
 
 ```sh
 {"name": "DB_URL", "value": "postgres://rdsuser:$DB_PASSWORD@my-db-instance/db_name"},
 ```
 
-ENV variable secrets can be overwritten. For example, if we use a different API_TOKEN locally or if we are using a local DB for which we will
+ENV variable secrets can be overwritten. For example, if we use a different `API_TOKEN` locally or if we are using a local DB for which we will
 use docker-compose, we can set:
 
 ```sh
@@ -144,7 +143,7 @@ API_TOKEN="123123123"
 DB_PASSWORD="local_secret"
 ```
 
-`init.sh` will always call the override of any secret if original value is not "SECRET".
+`init.sh` will always call the override of any secret if original value is not `SECRET`.
 
 ## Terraform and EC2/ECS policy configuration
 
@@ -162,7 +161,7 @@ resource "aws_ssm_parameter" "password" {
 }
 ```
 
-Where ${var.parameter_store_alias_arn} is a variable pointing to your parameter_store_key KMS alias arn.
+Where `${var.parameter_store_alias_arn}` is a variable pointing to your parameter_store_key KMS alias arn.
 
 Example IAM roles to give an ECS task permissions to read secrets using Terraform:
 
@@ -205,6 +204,7 @@ As all secrets are stored in AWS SSM parameter store. At the most basic level wi
 ```sh
 aws ssm get-parameters-by-path --path /service/secret_key --with-decryption | jq -r '.Parameters[0].Value'
 ```
+
 ## Local testing
 
-Run `docker build -t test .` to test build init.sh with alpine. You can change the base image in Dockerfile.
+Run `docker build -t test .` to test build `init.sh` with alpine. You can change the base image in `Dockerfile`.
