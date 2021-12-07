@@ -1,0 +1,20 @@
+FROM debian:stable-slim
+
+ENV SECRET_SERVICES="global signal"
+
+ENV ROLLBAR_TOKEN=SECRET
+ENV CIRCLECI_TOKEN=SECRET
+ENV OTHER_ENV_VAR=test_var
+
+RUN apt-get update -yy && apt-get install --no-install-recommends -yy \
+    curl \
+    ca-certificates \
+    && update-ca-certificates
+
+COPY ./init.sh /
+
+RUN chmod +x /init.sh && /init.sh
+
+COPY ./test-command.sh /test-command.sh
+
+CMD ["/init.sh", "/test-command.sh"]

@@ -207,4 +207,6 @@ aws ssm get-parameters-by-path --path /service/secret_key --with-decryption | jq
 
 ## Local testing
 
-Run `docker build -t test .` to test build `init.sh` with alpine. You can change the base image in `Dockerfile`.
+Run `make test` to test build `init.sh` with amazon linux 2/alpine/debian base images.
+
+This outputs three environment variables with secrets.

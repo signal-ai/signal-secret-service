@@ -1,0 +1,15 @@
+FROM amazonlinux:2
+
+ENV SECRET_SERVICES="global signal"
+
+ENV ROLLBAR_TOKEN=SECRET
+ENV CIRCLECI_TOKEN=SECRET
+ENV OTHER_ENV_VAR=test_var
+
+COPY ./init.sh /
+
+RUN chmod +x /init.sh && /init.sh
+
+COPY ./test-command.sh /test-command.sh
+
+CMD ["/init.sh", "/test-command.sh"]
