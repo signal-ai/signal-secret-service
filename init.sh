@@ -27,21 +27,20 @@ chamber_version="2.8.1"
 chamber_url="https://github.com/signal-ai/signal-secret-service/raw/master/chamber-upx/chamber-v${chamber_version}"
 chamber_checksum='48e2fe0c2111f82ab2899d00d7a7b4c850a7b2c79e95cdbf85d606b1acc41798  /chamber'
 
-
-# Install chamber using curl
-curl -V > /dev/null 2>&1
-curl_status=$?
-if [ $curl_status = 127 ]; then
-    if [ -f "/etc/alpine-release" ]; then
-        echo "Alpine Linux detected. Installing curl..."
-        apk --update add curl
-    else
-       echo "No curl installed. chamber will not be downloaded."
-       exit 1
-    fi
-fi
-
 if [ ! -f "/chamber" ]; then
+    # Install chamber using curl
+    curl -V > /dev/null 2>&1
+    curl_status=$?
+    if [ $curl_status = 127 ]; then
+        if [ -f "/etc/alpine-release" ]; then
+            echo "Alpine Linux detected. Installing curl..."
+            apk --update add curl
+        else
+           echo "No curl installed. chamber will not be downloaded."
+           exit 1
+        fi
+    fi
+
     echo "Downloading chamber from $chamber_url"
     echo "$chamber_checksum" > /sha256sum.txt
     curl -f -L $chamber_url -o /chamber
