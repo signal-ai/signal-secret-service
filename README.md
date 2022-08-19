@@ -22,7 +22,7 @@ export AWS_REGION=eu-west-1
 An example command to write a secret to SSM for a specific service:
 
 ```sh
-chamber write <service> <key> <value>
+AWS_PROFILE=signal-prod chamber write <service> <key> <value>
 ```
 
 If `-` is provided as the `<value>` argument, the value will be read from standard
