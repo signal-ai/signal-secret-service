@@ -1,7 +1,7 @@
 # chamber-upx
 
 This directory contains latest stable chamber (https://github.com/segmentio/chamber)
-binary for linux-amd64 . It is compressed by upx (https://github.com/upx/upx) so
+binary for linux-amd64 and linux-arm64. It is compressed by upx (https://github.com/upx/upx) so
 there's less overhead as possible when copied to a Docker container.
 
 To download chamber and compress it:
