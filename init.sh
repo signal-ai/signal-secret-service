@@ -34,7 +34,7 @@ case $(uname -m) in
     chamber_checksum='6a1cbefea09f2fbf2169c18aed57411c7d67a4035c1ae89c8e1cf0f180fbf8c0  /chamber'
     ;;
   *)
-    echo "Unsupported hardware platform $(uname -m)"
+    echo "Cannot run chamber: unsupported hardware platform $(uname -m)"
     exit 1
     ;;
 esac
