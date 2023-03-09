@@ -25,7 +25,7 @@ export AWS_REGION=$AWS_REGION
 
 chamber_version="2.12.0"
 case $(uname -m) in
-  "amd64")
+  "amd64" | "x64_64")
     chamber_url="https://github.com/signal-ai/signal-secret-service/raw/multiarch/chamber-upx/chamber-v${chamber_version}-linux-amd64"
     chamber_checksum='ad4a6bfe75078be65507c2974f0a8517c346cf2b91538eedce10baccfa3e2aeb  /chamber'
     ;;
