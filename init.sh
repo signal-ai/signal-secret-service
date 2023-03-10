@@ -26,11 +26,11 @@ export AWS_REGION=$AWS_REGION
 chamber_version="2.12.0"
 case $(uname -m) in
   "amd64" | "x86_64")
-    chamber_url="https://github.com/signal-ai/signal-secret-service/raw/multiarch/chamber-upx/chamber-v${chamber_version}-linux-amd64"
+    chamber_url="https://github.com/signal-ai/signal-secret-service/raw/master/chamber-upx/chamber-v${chamber_version}-linux-amd64"
     chamber_checksum='ad4a6bfe75078be65507c2974f0a8517c346cf2b91538eedce10baccfa3e2aeb  /chamber'
     ;;
   "arm64" | "aarch64")
-    chamber_url="https://github.com/signal-ai/signal-secret-service/raw/multiarch/chamber-upx/chamber-v${chamber_version}-linux-arm64"
+    chamber_url="https://github.com/signal-ai/signal-secret-service/raw/master/chamber-upx/chamber-v${chamber_version}-linux-arm64"
     chamber_checksum='6a1cbefea09f2fbf2169c18aed57411c7d67a4035c1ae89c8e1cf0f180fbf8c0  /chamber'
     ;;
   *)
