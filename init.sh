@@ -89,9 +89,7 @@ original_variables=$(export | cut -f2 -d ' ')
 # Call chamber with services from ENV $SECRET_SERVICES and export decrypted ENV variables
 echo "Fetching ENV secrets with chamber for systems $SECRET_SERVICES..."
 
-# We have to loop through $SECRET_SERVICES because 'chamber env' doesn't support
-# multiple services
-chamber_env=$(for s in $SECRET_SERVICES ; do /chamber env $s || rc=$? ; done ; exit $rc)
+chamber_env=$(/chamber export --format dotenv $SECRET_SERVICES)
 chamber_result=$?
 
 if [ $chamber_result != 0 ]; then
@@ -102,12 +100,12 @@ if [ $chamber_result != 0 ]; then
     fi
 fi
 
-# We want to remove 'export' from the env output and also convert - into _ for env names
-to_secrets=$(echo $chamber_env | sed 's/export //g' | for e in $(cat -) ; do echo $e | awk '{ gsub("-", "_", $1) } 1' FS='=' OFS='='; done)
+# We want to remove convert - into _ for env names
+to_secrets=$(echo $chamber_env | for e in $(cat -) ; do echo $e | awk '{ gsub("-", "_", $1) } 1' FS='=' OFS='='; done)
 eval_export $to_secrets
 
 # Perform overrides
-to_override=$(for k in $keys ; do for v in $original_variables ; do echo $v |grep ^$k |grep -v SECRET ; done ; done)
+to_override=$(for k in $keys ; do for v in $original_variables ; do echo $v | grep ^$k |grep -v SECRET ; done ; done)
 if [ ! -z "$to_override" -a "$to_override" != " " ]; then
     echo "Applying ENV overrides..."
     eval_export $to_override
@@ -115,7 +113,7 @@ fi
 
 # Perform variable extrapolation
 secret_keys=$(for v in $to_secrets ; do echo $v | awk -F '=' '{print $1}' ; done)
-to_extrapolate=$(for k in $secret_keys ; do env |grep "\$$k" ; done | uniq | sed 's/\(=[[:blank:]]*\)\(.*\)/\1"\2"/')
+to_extrapolate=$(for k in $secret_keys ; do env | grep "\$$k" ; done | uniq | sed 's/\(=[[:blank:]]*\)\(.*\)/\1"\2"/')
 if [ ! -z "$to_extrapolate" -a "$to_extrapolate" != " " ]; then
     echo "Applying ENV extrapolation..."
     eval_export $to_extrapolate
